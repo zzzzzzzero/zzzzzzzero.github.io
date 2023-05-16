@@ -1,0 +1,10 @@
+[{
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.example.dwallet",
+      "sha256_cert_fingerprints":
+      ["ee:02:94:da:8e:2a:a7:70:50:27:c6:0a:6b:ae:84:9b:58:d8:cd:95:3e:17:3b:ae:e9:5f:d3:44:00:4f:ea:f5"]
+    }
+  }]
+  
