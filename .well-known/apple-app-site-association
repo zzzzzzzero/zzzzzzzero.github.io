@@ -1,15 +1,10 @@
 {
-  "applinks": {
-      "details": [
-           {
-             "appIDs": [ "A8HTEQW583.jp.tokenpocket.darwin" ],
-             "components": [
-               {
-                  "/": "/auth/login-success.html",
-                  "comment": "Matches URL of login-success page."
-               }
-             ]
-           }
-       ]
-   }
+    "applinks": {
+        "details": [
+            {
+                "appID": "A8HTEQW583.jp.tokenpocket.darwin",
+                "paths": ["*"]
+            }
+        ]
+    }
 }
