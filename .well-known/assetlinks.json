@@ -13,7 +13,16 @@
         "namespace": "android_app",
         "package_name": "io.nttdigital.santaclaus.wallet.test2",
         "sha256_cert_fingerprints":
-        ["4D:1A:D7:89:50:CA:65:3B:B2:24:BE:11:76:92:EB:F1:7E:DA:57:98:0D:7C:B8:9B:A2:B7:81:33:B0:4B:A2:62","9A:5F:59:C4:27:63:B2:B3:9B:34:EF:76:CA:21:7F:0C:BC:03:B2:B2:B2:F1:70:C0:E6:E3:DD:8C:88:10:ED:BC"]
+        ["4D:1A:D7:89:50:CA:65:3B:B2:24:BE:11:76:92:EB:F1:7E:DA:57:98:0D:7C:B8:9B:A2:B7:81:33:B0:4B:A2:62"]
+      }
+    },
+{
+      "relation": ["delegate_permission/common.handle_all_urls"],
+      "target": {
+        "namespace": "android_app",
+        "package_name": "io.nttdigital.santaclaus.wallet.test2",
+        "sha256_cert_fingerprints":
+        ["9A:5F:59:C4:27:63:B2:B3:9B:34:EF:76:CA:21:7F:0C:BC:03:B2:B2:B2:F1:70:C0:E6:E3:DD:8C:88:10:ED:BC"]
       }
     },
 ]
