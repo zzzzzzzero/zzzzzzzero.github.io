@@ -6,5 +6,15 @@
       "sha256_cert_fingerprints":
       ["ee:02:94:da:8e:2a:a7:70:50:27:c6:0a:6b:ae:84:9b:58:d8:cd:95:3e:17:3b:ae:e9:5f:d3:44:00:4f:ea:f5"]
     }
-  }]
+  },
+  {
+      "relation": ["delegate_permission/common.handle_all_urls"],
+      "target": {
+        "namespace": "android_app",
+        "package_name": "io.nttdigital.santaclaus.wallet.test2",
+        "sha256_cert_fingerprints":
+        ["4D:1A:D7:89:50:CA:65:3B:B2:24:BE:11:76:92:EB:F1:7E:DA:57:98:0D:7C:B8:9B:A2:B7:81:33:B0:4B:A2:62"]
+      }
+    }
+]
   
