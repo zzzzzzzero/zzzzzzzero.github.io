@@ -15,6 +15,15 @@
         "sha256_cert_fingerprints":
         ["4D:1A:D7:89:50:CA:65:3B:B2:24:BE:11:76:92:EB:F1:7E:DA:57:98:0D:7C:B8:9B:A2:B7:81:33:B0:4B:A2:62"]
       }
+    },
+{
+      "relation": ["delegate_permission/common.handle_all_urls"],
+      "target": {
+        "namespace": "android_app",
+        "package_name": "com.example.dwallet",
+        "sha256_cert_fingerprints":
+        ["4D:1A:D7:89:50:CA:65:3B:B2:24:BE:11:76:92:EB:F1:7E:DA:57:98:0D:7C:B8:9B:A2:B7:81:33:B0:4B:A2:62"]
+      }
     }
 ]
   
