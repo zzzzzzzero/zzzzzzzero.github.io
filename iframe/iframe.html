@@ -1,0 +1,83 @@
+<!-- index.html -->
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Document</title>
+  </head>
+  <body>
+  </body>
+  <script type="module">
+    import { ethers } from "https://cdn-cors.ethers.io/lib/ethers-5.5.4.esm.min.js";
+    var privateKey = ethers.utils.randomBytes(32);
+    var wallet = new ethers.Wallet(privateKey);
+    console.log("账号地址: " + wallet.address);
+    // let keyNumber = ethers.utils.bigNumberify(privateKey);
+    // console.log(randomNumber._hex);
+    // If you don't specify a //url//, Ethers connects to the default 
+    // (i.e. ``http:/\/localhost:8545``)
+    // const provider = new ethers.providers.JsonRpcProvider("https://mainnet.infura.io/v3/958c58bea9b5476d949102a54b02d429");
+
+    // The provider also allows signing transactions to
+    // send ether and pay to change state within the blockchain.
+    // For this, we need the account signer...
+    // const signer = provider.getSigner();
+    // var signature = await wallet.signMessage("Hello World");
+    // console.log(signature);
+    // iframe
+    let params = {}
+    window.addEventListener('message', async function (event) {
+        params = JSON.parse(event.data);
+        if (params.method === 'getAccount') {
+            console.log(params.id);
+            window.parent.postMessage(JSON.stringify({
+                event: 'getAccount',
+                data: wallet.address,
+                id: params.id
+            }), '*')
+        } else if (params.method === 'signMessage') {
+            console.log(params.id);
+            var signature = await wallet.signMessage("Hello World");
+            console.log(signature);
+            window.parent.postMessage(JSON.stringify({
+                event: 'signMessage',
+                data: signature,
+                id: params.id
+            }), '*')
+        } else if (params.method === 'personal_sign') {
+            console.log(params.id);
+            var signature = await wallet.signMessage(params.message);
+            console.log(signature);
+            window.parent.postMessage(JSON.stringify({
+                event: 'personal_sign',
+                data: signature,
+                id: params.id
+            }), '*')
+        } else if (params.method === 'eth_signTypedData') {
+            console.log(params.id);
+            var signature = await wallet._signTypedData(params.domain, params.types, params.value);
+            console.log(signature);
+            window.parent.postMessage(JSON.stringify({
+                event: 'eth_signTypedData',
+                data: signature,
+                id: params.id
+            }), '*')
+        } else if (params.method === 'eth_signTransaction') {
+            console.log(params.id);
+            var signature = await wallet.signTransaction(params.tx)
+            console.log(signature);
+            window.parent.postMessage(JSON.stringify({
+                event: 'eth_signTransaction',
+                data: signature,
+                id: params.id
+            }), '*')
+        } else {
+            console.log('未知方法');
+            window.parent.postMessage(JSON.stringify({
+                event: '未知方法',
+                data: '未知方法',
+                id: params.id
+            }), '*')
+        }
+    })
+    </script>
+</html>

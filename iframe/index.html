@@ -1,0 +1,140 @@
+<!-- index.html -->
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Document</title>
+    <style type="text/css">
+		.button {
+            margin-top: 16px;
+            min-width: 250px;
+			background-color: transparent;
+            border: 1px solid #bbb;
+            border-radius: 2px;
+            box-sizing: border-box;
+            color: #555;
+            cursor: pointer;
+            display: inline-block;
+            font-weight: 500;
+            height: 38px;
+            line-height: 38px;
+            padding: 0 30px;
+            text-align: center;
+            text-decoration: none;
+            white-space: nowrap;
+		}
+        .result {
+            width: 300px;
+            word-break: break-all;
+        }
+	</style>
+  </head>
+  <body>
+    <div style="text-align: center;">
+        <button class="button" onclick="personal_sign()">personal_sign</button>
+        <br>
+        <button class="button" onclick="eth_signTypedData()">eth_signTypedData</button>
+        <br>
+        <button class="button" onclick="eth_signTransaction()">eth_signTransaction</button>
+    </div>
+    <dialog id="dialog">
+        <p id="result" class="result"></p>
+        <form method="dialog">
+          <button>OK</button>
+        </form>
+      </dialog>
+    <iframe src="https://zzzzzzzero.github.io/iframe/iframe.html" id="authIframe" style="display: none;"></iframe>
+  </body>
+  <script>
+    // index.html
+    let authIframe = document.getElementById('authIframe')
+    function personal_sign() {
+        let params = {
+            id: 1,
+            method: 'personal_sign',
+            message: 'darwin personal_sign'
+        }
+        authIframe.contentWindow.postMessage(JSON.stringify(params), '*')
+    }
+
+    function eth_signTypedData() {
+        // 作用域中的所有属性都是可选的
+        const domain = {
+            name: 'Ether Mail',
+            version: '1',
+            chainId: 1,
+            verifyingContract: '0xCcCCccccCCCCcCCCCCCcCcCccCcCCCcCcccccccC'
+        };
+
+        // 所有类型定义的name列表
+        const types = {
+            Person: [
+                { name: 'name', type: 'string' },
+                { name: 'wallet', type: 'address' }
+            ],
+            Mail: [
+                { name: 'from', type: 'Person' },
+                { name: 'to', type: 'Person' },
+                { name: 'contents', type: 'string' }
+            ]
+        };
+
+        // 待签名的数据
+        const value = {
+            from: {
+                name: 'Cow',
+                wallet: '0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826'
+            },
+            to: {
+                name: 'Bob',
+                wallet: '0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB'
+            },
+            contents: 'Hello, Bob!'
+        };
+
+        let params = {
+            id: 2,
+            method: 'eth_signTypedData',
+            domain: domain,
+            types: types,
+            value: value
+        }
+        authIframe.contentWindow.postMessage(JSON.stringify(params), '*')
+    }
+
+    function eth_signTransaction() {
+        const account = '0xd46e8dd67c5d32be8058bb8eb970870f07244568'
+        let params = {
+            id: 3,
+            method: 'eth_signTransaction',
+            tx: {
+                to: '0xd46e8dd67c5d32be8058bb8eb970870f07244567',
+                value: '0x11200C7644D50000', // 1.234ETH
+                nonce: '0x117', // 279
+                data: '0xd46e8dd67c5d32be8d46e8dd67c5d32be8058bb8eb970870f072445675058bb8eb970870f072445675',
+            }
+        }
+        authIframe.contentWindow.postMessage(JSON.stringify(params), '*')
+    }
+    // authIframe.addEventListener('load', function (e) {
+    //     let params = {
+    //         id: 1213,
+    //         method: 'getAccount'
+    //     }
+    //     authIframe.contentWindow.postMessage(JSON.stringify(params), '*')
+    //     params.method = 'signMessage'
+    //     authIframe.contentWindow.postMessage(JSON.stringify(params), '*')
+    // })
+    const resultDialog = document.getElementById('dialog');
+    const result = document.getElementById('result');
+    window.addEventListener('message', function (e) {
+        try {
+            let data = JSON.parse(e.data)
+            console.log(data)
+            result.textContent = e.data;
+            resultDialog.showModal();
+        } catch (error) {
+            console.log(error)
+        }
+    })
+  </script>
+</html>
