@@ -30,11 +30,21 @@
   </head>
   <body>
     <div style="text-align: center;">
+        <button class="button" onclick="create_wallet()">create_wallet</button>
+        <br>
+        <button class="button" onclick="delete_wallet()">delete_wallet</button>
+        <br>
         <button class="button" onclick="personal_sign()">personal_sign</button>
+        <br>
+        <button class="button" onclick="personal_sign()">eth_sign</button>
         <br>
         <button class="button" onclick="eth_signTypedData()">eth_signTypedData</button>
         <br>
+        <button class="button" onclick="eth_signTypedData()">eth_signTypedData_v4</button>
+        <br>
         <button class="button" onclick="eth_signTransaction()">eth_signTransaction</button>
+        <br>
+        <button class="button" onclick="eth_sendTransaction()">eth_sendTransaction</button>
     </div>
     <dialog id="dialog">
         <p id="result" class="result"></p>
@@ -42,11 +52,28 @@
           <button>OK</button>
         </form>
       </dialog>
+    <!-- <iframe src="file:///Users/zero/work/tokenPocket/iframe/iframe.html" id="authIframe" style="display: none;"></iframe> -->
     <iframe src="https://liubin-lszzg.github.io/iframe/iframe.html" id="authIframe" style="display: none;"></iframe>
   </body>
   <script>
     // index.html
     let authIframe = document.getElementById('authIframe')
+    function create_wallet() {
+        let params = {
+            id: 0,
+            method: 'createWallet'
+        }
+        authIframe.contentWindow.postMessage(JSON.stringify(params), '*')
+    }
+
+    function delete_wallet() {
+        let params = {
+            id: 1,
+            method: 'deleteWallet'
+        }
+        authIframe.contentWindow.postMessage(JSON.stringify(params), '*')
+    }
+
     function personal_sign() {
         let params = {
             id: 1,
@@ -114,6 +141,21 @@
             }
         }
         authIframe.contentWindow.postMessage(JSON.stringify(params), '*')
+    }
+
+    function eth_sendTransaction() {
+        let params = {
+            id: 4,
+            method: 'eth_sendTransaction',
+            tx: {
+                to: '0xd46e8dd67c5d32be8058bb8eb970870f07244567',
+                value: '0x11200C7644D50000', // 1.234ETH
+                nonce: '0x117', // 279
+                data: '0xd46e8dd67c5d32be8d46e8dd67c5d32be8058bb8eb970870f072445675058bb8eb970870f072445675',
+            }
+        }
+        authIframe.contentWindow.postMessage(JSON.stringify(params), '*')
+
     }
     // authIframe.addEventListener('load', function (e) {
     //     let params = {

@@ -5,12 +5,302 @@
     <title>Document</title>
   </head>
   <body>
+    <p>Drive API Quickstart</p>
+
+    <!--Add buttons to initiate auth sequence and sign out-->
+    <button id="authorize_button" onclick="handleAuthClick()">Authorize</button>
+    <button id="signout_button" onclick="handleSignoutClick()">Sign Out</button>
+
+    <pre id="content" style="white-space: pre-wrap;"></pre>
+
+    <script type="text/javascript">
+      /* exported gapiLoaded */
+      /* exported gisLoaded */
+      /* exported handleAuthClick */
+      /* exported handleSignoutClick */
+
+      // TODO(developer): Set to client ID and API key from the Developer Console
+      const CLIENT_ID = '8254848703-aetn80ao92u607b8qpbccqui5l482c6u.apps.googleusercontent.com';
+      const API_KEY = 'AIzaSyAC9cyct6joRp2ezlVUVmV_QPu26B4Ubn4';
+
+      // Discovery doc URL for APIs used by the quickstart
+      const DISCOVERY_DOC = 'https://www.googleapis.com/discovery/v1/apis/drive/v3/rest';
+
+      // Authorization scopes required by the API; multiple scopes can be
+      // included, separated by spaces.
+      const SCOPES = 'https://www.googleapis.com/auth/drive.metadata.readonly https://www.googleapis.com/auth/drive.appdata';
+
+      let tokenClient;
+      let gapiInited = false;
+      let gisInited = false;
+
+      document.getElementById('authorize_button').style.visibility = 'hidden';
+      document.getElementById('signout_button').style.visibility = 'hidden';
+
+      /**
+       * Callback after api.js is loaded.
+       */
+      function gapiLoaded() {
+        gapi.load('client', initializeGapiClient);
+      }
+
+      /**
+       * Callback after the API client is loaded. Loads the
+       * discovery doc to initialize the API.
+       */
+      async function initializeGapiClient() {
+        await gapi.client.init({
+          apiKey: API_KEY,
+          discoveryDocs: [DISCOVERY_DOC],
+        });
+        gapiInited = true;
+        maybeEnableButtons();
+      }
+
+      /**
+       * Callback after Google Identity Services are loaded.
+       */
+      function gisLoaded() {
+        tokenClient = google.accounts.oauth2.initTokenClient({
+          client_id: CLIENT_ID,
+          scope: SCOPES,
+          callback: '', // defined later
+        });
+        gisInited = true;
+        maybeEnableButtons();
+      }
+
+      /**
+       * Enables user interaction after all libraries are loaded.
+       */
+      function maybeEnableButtons() {
+        if (gapiInited && gisInited) {
+          document.getElementById('authorize_button').style.visibility = 'visible';
+        }
+      }
+
+      /**
+       *  Sign in the user upon button click.
+       */
+      function handleAuthClick() {
+        tokenClient.callback = async (resp) => {
+          if (resp.error !== undefined) {
+            throw (resp);
+          }
+          document.getElementById('signout_button').style.visibility = 'visible';
+          document.getElementById('authorize_button').innerText = 'Refresh';
+          await listFiles();
+        };
+
+        if (gapi.client.getToken() === null) {
+          // Prompt the user to select a Google Account and ask for consent to share their data
+          // when establishing a new session.
+          tokenClient.requestAccessToken({prompt: 'consent'});
+        } else {
+          // Skip display of account chooser and consent dialog for an existing session.
+          tokenClient.requestAccessToken({prompt: ''});
+        }
+      }
+
+      /**
+       *  Sign out the user upon button click.
+       */
+      function handleSignoutClick() {
+        const token = gapi.client.getToken();
+        if (token !== null) {
+          google.accounts.oauth2.revoke(token.access_token);
+          gapi.client.setToken('');
+          document.getElementById('content').innerText = '';
+          document.getElementById('authorize_button').innerText = 'Authorize';
+          document.getElementById('signout_button').style.visibility = 'hidden';
+        }
+      }
+
+      /**
+       * Print metadata for first 10 files.
+       */
+      async function listFiles() {
+        let response;
+        try {
+          response = await gapi.client.drive.files.list({
+            'pageSize': 10,
+            'fields': 'files(id, name)',
+          });
+        } catch (err) {
+          document.getElementById('content').innerText = err.message;
+          return;
+        }
+        const files = response.result.files;
+        if (!files || files.length == 0) {
+          document.getElementById('content').innerText = 'No files found.';
+          return;
+        }
+        // Flatten to string to display
+        const output = files.reduce(
+            (str, file) => `${str}${file.name} (${file.id})\n`,
+            'Files:\n');
+        document.getElementById('content').innerText = output;
+
+        const fileMetadata = {
+            name: 'config.json',
+            parents: ['appDataFolder'],
+        };
+        const media = {
+            mimeType: 'application/json',
+            body: "{'name': 'test'}",
+        };
+        gapi.client.drive.files.create({
+            resource: fileMetadata,
+            media: media,
+            fields: 'id'
+        }).then(function(response) {
+            console.log('File Id: ', response.result.id);
+        });
+      }
+    </script>
+    <script async defer src="https://apis.google.com/js/api.js" onload="gapiLoaded()"></script>
+    <script async defer src="https://accounts.google.com/gsi/client" onload="gisLoaded()"></script>
   </body>
   <script type="module">
+    // Import the functions you need from the SDKs you need
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-analytics.js";
+    // TODO: Add SDKs for Firebase products that you want to use
+    // https://firebase.google.com/docs/web/setup#available-libraries
+  
+    // Your web app's Firebase configuration
+    // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+    const firebaseConfig = {
+      apiKey: "AIzaSyAC9cyct6joRp2ezlVUVmV_QPu26B4Ubn4",
+      authDomain: "darwin-tp.firebaseapp.com",
+      databaseURL: "https://darwin-tp-default-rtdb.asia-southeast1.firebasedatabase.app",
+      projectId: "darwin-tp",
+      storageBucket: "darwin-tp.appspot.com",
+      messagingSenderId: "8254848703",
+      appId: "1:8254848703:web:ec86d1a2c530844a32d00a",
+      measurementId: "G-0TV4DJKMVJ"
+    };
+  
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const analytics = getAnalytics(app);
+  </script>
+  <script type="module">
     import { ethers } from "https://cdn-cors.ethers.io/lib/ethers-5.5.4.esm.min.js";
-    var privateKey = ethers.utils.randomBytes(32);
-    var wallet = new ethers.Wallet(privateKey);
-    console.log("账号地址: " + wallet.address);
+    // const provider = new ethers.providers.JsonRpcProvider();
+    const provider = ethers.getDefaultProvider("https://mainnet.infura.io/v3/958c58bea9b5476d949102a54b02d429");
+    // var privateKey = ethers.utils.randomBytes(32);
+    // var wallet = new ethers.Wallet(privateKey);
+    // console.log("账号地址: " + wallet.address);
+
+    function createWallet() {
+        let mnemonic = "radar blur cabbage chef fix engine embark joy scheme fiction master release";
+        let mnemonicWallet = ethers.Wallet.fromMnemonic(mnemonic);
+        // localStorage.mnemonic = mnemonic;
+        localStorage.walletAddress = mnemonicWallet.address;
+        // Load the first account from a mnemonic
+        let path = "m/44'/60'/0'/0/0";
+        let wallet = ethers.Wallet.fromMnemonic(mnemonic, path);
+        console.log("账号地址: " + wallet.address);
+        // 生成用于AES加密的随机密钥
+        // const mnemonicKey = ethers.utils.randomBytes(32);
+        // console.log(mnemonicKey);
+        // localStorage.mnemonicKey = mnemonicKey;
+        // 将mnemonic加密
+        // const mnemonicCiphertext = ethers.utils.AES.encrypt(mnemonicKey, mnemonic);
+        // console.log(mnemonicCiphertext);
+        // localStorage.mnemonicCiphertext = mnemonicCiphertext;
+        // Web Crypto API进行AES加密
+        let iv = window.crypto.getRandomValues(new Uint8Array(12));
+        console.log(iv);
+        localStorage.iv = toBase64(iv);
+        window.crypto.subtle.generateKey(
+            {
+                name: "AES-GCM",
+                length: 256,
+            },
+            true,
+            ["encrypt", "decrypt"]
+        ).then(function (key) {
+            // localStorage.mnemonicKey = key;
+            exportCryptoKey(key);
+            console.log(key);
+            // 使用AES密钥加密mnemonic
+            window.crypto.subtle.encrypt(
+                {
+                    name: "AES-GCM",
+                    iv: iv,
+                },
+                key,
+                new TextEncoder().encode(mnemonic)
+            ).then(function (encrypted) {
+                localStorage.encryptedMnemonic = toBase64(new Uint8Array(encrypted));
+                console.log(encrypted);
+                // 使用AES密钥解密mnemonic
+                // window.crypto.subtle.decrypt(
+                //     {
+                //         name: "AES-GCM",
+                //         iv: iv,
+                //     },
+                //     key,
+                //     encrypted
+                // ).then(function (decrypted) {
+                //     console.log(new TextDecoder().decode(decrypted));
+                // });
+            });
+        });
+    }
+
+    function toUint8Array(value) {
+        return new Uint8Array(atob(value).split("").map(function (c) {
+            return c.charCodeAt(0);
+        }));
+    }
+
+    function toBase64(value) {
+        return btoa(String.fromCharCode.apply(null, value));
+    }
+
+    async function exportCryptoKey(key) {
+        const exported = await window.crypto.subtle.exportKey("raw", key);
+        const exportedKeyBuffer = new Uint8Array(exported);
+        // base64编码
+        const exportedKeyString = btoa(String.fromCharCode.apply(null, exportedKeyBuffer));
+        localStorage.mnemonicKey = exportedKeyString;
+        return exportedKeyString;
+    }
+
+    function importSecretKey(rawKey) {
+        // 将base64编码的密钥转换为Uint8Array
+        rawKey = toUint8Array(rawKey).buffer;
+        return window.crypto.subtle.importKey("raw", rawKey, "AES-GCM", true, [
+            "encrypt",
+            "decrypt",
+        ]);
+    }
+
+    async function restoreWallet() {
+        // 将mnemonicCiphertext解密
+        let iv = toUint8Array(localStorage.iv);
+        let encrypted = toUint8Array(localStorage.encryptedMnemonic).buffer;
+        let decrypted = await window.crypto.subtle.decrypt(
+            {
+                name: "AES-GCM",
+                iv: iv,
+            },
+            await importSecretKey(localStorage.mnemonicKey),
+            encrypted
+        );
+        let mnemonic = new TextDecoder().decode(decrypted)
+        let mnemonicWallet = ethers.Wallet.fromMnemonic(mnemonic);
+        return mnemonicWallet.connect(provider);
+    }
+
+    function getWalletAddress() {
+        console.log(localStorage.walletAddress);
+        return localStorage.walletAddress;
+    }
+
     // let keyNumber = ethers.utils.bigNumberify(privateKey);
     // console.log(randomNumber._hex);
     // If you don't specify a //url//, Ethers connects to the default 
@@ -27,15 +317,34 @@
     let params = {}
     window.addEventListener('message', async function (event) {
         params = JSON.parse(event.data);
-        if (params.method === 'getAccount') {
+        // provider.getBlockNumber().then(function (blockNumber) {
+        //     console.log(blockNumber);
+        // });
+        if (params.method === 'createWallet') {
+            createWallet();
+            window.parent.postMessage(JSON.stringify({
+                event: 'createWallet',
+                data: getWalletAddress(),
+                id: params.id
+            }), '*')
+        } else if (params.method === 'deleteWallet') {
+            console.log(params.id);
+            localStorage.clear();
+            window.parent.postMessage(JSON.stringify({
+                event: 'deleteWallet',
+                data: 'success',
+                id: params.id
+            }), '*')
+        } else if (params.method === 'getAccount') {
             console.log(params.id);
             window.parent.postMessage(JSON.stringify({
                 event: 'getAccount',
-                data: wallet.address,
+                data: getWalletAddress(),
                 id: params.id
             }), '*')
         } else if (params.method === 'signMessage') {
             console.log(params.id);
+            let wallet = await restoreWallet();
             var signature = await wallet.signMessage("Hello World");
             console.log(signature);
             window.parent.postMessage(JSON.stringify({
@@ -45,6 +354,7 @@
             }), '*')
         } else if (params.method === 'personal_sign') {
             console.log(params.id);
+            let wallet = await restoreWallet();
             var signature = await wallet.signMessage(params.message);
             console.log(signature);
             window.parent.postMessage(JSON.stringify({
@@ -54,6 +364,7 @@
             }), '*')
         } else if (params.method === 'eth_signTypedData') {
             console.log(params.id);
+            let wallet = await restoreWallet();
             var signature = await wallet._signTypedData(params.domain, params.types, params.value);
             console.log(signature);
             window.parent.postMessage(JSON.stringify({
@@ -63,6 +374,7 @@
             }), '*')
         } else if (params.method === 'eth_signTransaction') {
             console.log(params.id);
+            let wallet = await restoreWallet();
             var signature = await wallet.signTransaction(params.tx)
             console.log(signature);
             window.parent.postMessage(JSON.stringify({
@@ -70,13 +382,24 @@
                 data: signature,
                 id: params.id
             }), '*')
-        } else {
-            console.log('未知方法');
+        } else if (params.method === 'eth_sendTransaction') {
+            console.log(params.id);
+            let wallet = await restoreWallet();
+            var result = await wallet.sendTransaction(params.tx)
+            console.log(result);
+            wallet.s
             window.parent.postMessage(JSON.stringify({
-                event: '未知方法',
-                data: '未知方法',
+                event: 'eth_sendTransaction',
+                data: result,
                 id: params.id
             }), '*')
+        } else {
+            console.log('未知方法');
+            // window.parent.postMessage(JSON.stringify({
+            //     event: '未知方法',
+            //     data: '未知方法',
+            //     id: params.id
+            // }), '*')
         }
     })
     </script>
